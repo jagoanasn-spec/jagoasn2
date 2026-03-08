@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JagoASN – Mobile Preview</title>
+  <title>JagoASN</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
@@ -410,6 +410,46 @@
 </head>
 <body>
 
+<!-- ============================================================
+  ✏️  KONFIGURASI LINK — Isi URL di sini, lalu simpan file
+  ============================================================
+
+  FORMAT:
+    LINK_[NAMA_MENU] : "https://namawebsite.com/halaman"
+
+  Ganti teks antara tanda kutip ("...") dengan link tujuan Anda.
+  Jangan ubah nama variabelnya.
+============================================================ -->
+<script>
+  const LINKS = {
+
+    /* ─── PLATFORM UTAMA ─────────────────────────────────────── */
+    PORTAL_BELAJAR   : "https://jagoasn.com/",   // 🌐 Portal Belajar JagoASN
+    YOUTUBE_CHANNEL  : "https://www.youtube.com/@JagoASN",   // 🎬 Kelas Gratis di YouTube
+
+    /* ─── FITUR & LAYANAN ────────────────────────────────────── */
+    TRYOUT_GRATIS    : "https://jagoasn.com/",   // ✅ Tryout Gratis SKD CPNS
+    KELAS_INTENSIF   : "https://",   // 📚 Daftar Kelas Intensif
+    GRUP_BELAJAR     : "https://",   // 👥 Gabung Grup Belajar
+
+    /* ─── SOSIAL MEDIA ───────────────────────────────────────── */
+    WHATSAPP_ADMIN   : "https://wa.me/",   // 💬 WhatsApp Admin (contoh: https://wa.me/6281234567890)
+    INSTAGRAM        : "https://instagram.com/",   // 📷 Instagram JagoASN
+
+  };
+
+  /* Terapkan link ke semua tombol setelah halaman dimuat */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("btn-portal").href        = LINKS.PORTAL_BELAJAR;
+    document.getElementById("btn-youtube").href       = LINKS.YOUTUBE_CHANNEL;
+    document.getElementById("btn-tryout").href        = LINKS.TRYOUT_GRATIS;
+    document.getElementById("btn-kelas").href         = LINKS.KELAS_INTENSIF;
+    document.getElementById("btn-grup").href          = LINKS.GRUP_BELAJAR;
+    document.getElementById("btn-whatsapp").href      = LINKS.WHATSAPP_ADMIN;
+    document.getElementById("btn-instagram").href     = LINKS.INSTAGRAM;
+  });
+</script>
+
 <div class="phone-glow"></div>
 
 <div class="phone-shell">
@@ -471,7 +511,8 @@
 
         <div class="lt-group">
 
-          <a href="#" class="lt-btn lt-primary">
+          <!-- 🌐 Portal Belajar JagoASN — isi link di LINKS.PORTAL_BELAJAR -->
+          <a id="btn-portal" href="#" class="lt-btn lt-primary" target="_blank" rel="noopener">
             <div class="lt-pulse"></div>
             <div class="lt-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -487,7 +528,8 @@
             <svg class="lt-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
-          <a href="#" class="lt-btn lt-cyan">
+          <!-- 🎬 YouTube Channel — isi link di LINKS.YOUTUBE_CHANNEL -->
+          <a id="btn-youtube" href="#" class="lt-btn lt-cyan" target="_blank" rel="noopener">
             <div class="lt-pulse"></div>
             <div class="lt-icon">
               <svg viewBox="0 0 24 24" fill="white">
@@ -509,7 +551,8 @@
 
         <div class="lt-group">
 
-          <a href="#" class="lt-btn lt-glass">
+          <!-- ✅ Tryout Gratis — isi link di LINKS.TRYOUT_GRATIS -->
+          <a id="btn-tryout" href="#" class="lt-btn lt-glass" target="_blank" rel="noopener">
             <div class="lt-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 11l3 3L22 4"/>
@@ -523,7 +566,8 @@
             <svg class="lt-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
-          <a href="#" class="lt-btn lt-glass">
+          <!-- 📚 Kelas Intensif — isi link di LINKS.KELAS_INTENSIF -->
+          <a id="btn-kelas" href="#" class="lt-btn lt-glass" target="_blank" rel="noopener">
             <div class="lt-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -537,7 +581,8 @@
             <svg class="lt-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
-          <a href="#" class="lt-btn lt-glass">
+          <!-- 👥 Grup Belajar — isi link di LINKS.GRUP_BELAJAR -->
+          <a id="btn-grup" href="#" class="lt-btn lt-glass" target="_blank" rel="noopener">
             <div class="lt-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -559,14 +604,18 @@
 
         <!-- SOCIAL -->
         <div class="lt-social">
-          <a href="#" class="lt-social-btn">
+
+          <!-- 💬 WhatsApp Admin — isi link di LINKS.WHATSAPP_ADMIN -->
+          <a id="btn-whatsapp" href="#" class="lt-social-btn" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="#25d366" width="15" height="15">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
               <path d="M11.98 0C5.37 0 0 5.373 0 11.988c0 2.109.553 4.09 1.524 5.808L.057 24l6.304-1.654a11.95 11.95 0 0 0 5.62 1.406h.005C18.59 23.752 24 18.379 24 11.764 24 5.176 18.59 0 11.98 0zm.004 21.747a9.924 9.924 0 0 1-5.058-1.384l-.362-.215-3.754.984 1.002-3.655-.237-.376A9.917 9.917 0 0 1 2.05 11.988C2.05 6.482 6.48 2.05 11.984 2.05c5.497 0 9.965 4.432 9.965 9.93 0 5.49-4.468 9.767-9.965 9.767z"/>
             </svg>
             WhatsApp Admin
           </a>
-          <a href="#" class="lt-social-btn">
+
+          <!-- 📷 Instagram — isi link di LINKS.INSTAGRAM -->
+          <a id="btn-instagram" href="#" class="lt-social-btn" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
               <defs>
                 <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -581,6 +630,7 @@
             </svg>
             Instagram
           </a>
+
         </div>
 
         <!-- FOOTER -->
