@@ -1,449 +1,389 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JagoASN – Platform Belajar CPNS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cek Kelulusan - SMA Negeri 1 Bunut</title>
+  
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { min-height: 100%; }
-
-    body {
-      min-height: 100vh;
-      font-family: 'DM Sans', sans-serif;
-      background: linear-gradient(168deg, #ffffff 0%, #edf4ff 40%, #f6faff 100%);
-      position: relative;
-      overflow-x: hidden;
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    html, body { height: 100vh; width: 100vw; margin: 0; padding: 0; overflow-x: hidden; }
+    
+    .glass { 
+      background: rgba(255,255,255,0.95); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
     }
-
-    /* BG effects */
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 55% 45% at 20% 30%, rgba(80,160,255,.18) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(60,190,255,.12) 0%, transparent 55%);
-      pointer-events: none; z-index: 0;
+    
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeDown { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-20px); } }
+    @keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(-250px) rotate(720deg); opacity:0; } }
+    @keyframes scaleIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+    
+    .fade-up { animation: fadeUp 0.6s ease-out forwards; }
+    .fade-out { animation: fadeDown 0.4s ease-in forwards; }
+    .scale-in { animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .confetti-piece { position:absolute; width:8px; height:8px; border-radius:2px; animation: confetti 1.5s ease forwards; }
+    
+    input, button { transition: all 0.3s ease; }
+    input:focus { outline: none; ring: 2px solid #0284c7; }
+    
+    /* FIXED: Input height sama PERSIS di HP */
+    input[type="text"], 
+    input[type="date"] { 
+      height: 48px !important; 
+      padding: 0 12px !important; 
+      font-size: 16px !important; 
     }
-    body::after {
-      content: ''; position: fixed; inset: 0;
-      background-image: radial-gradient(rgba(60,130,220,.14) 1.2px, transparent 1.2px);
-      background-size: 22px 22px;
-      pointer-events: none; z-index: 0;
+    
+    /* HP: Date input fix */
+    @media (max-width: 640px) {
+      input[type="date"] {
+        font-size: 16px !important;
+        padding: 0 12px 1px 12px !important;
+        background: white;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0.7;
+        cursor: pointer;
+      }
     }
-
-    .scan {
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 4px,
-        rgba(120,180,255,.028) 4px, rgba(120,180,255,.028) 5px
-      );
-    }
-
-    .blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
-    .blob1 { width:500px; height:500px; top:-150px; left:-150px;
-      background: radial-gradient(circle, rgba(80,160,255,.12) 0%, transparent 70%); }
-    .blob2 { width:420px; height:420px; top:40%; right:-120px;
-      background: radial-gradient(circle, rgba(0,190,255,.09) 0%, transparent 70%); }
-    .blob3 { width:360px; height:360px; bottom:-80px; left:10%;
-      background: radial-gradient(circle, rgba(100,180,255,.1) 0%, transparent 70%); }
-
-    /* PAGE */
-    .page {
-      position: relative; z-index: 2;
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 48px 16px 60px;
-    }
-
-    .container {
-      width: 100%; max-width: 480px;
-      display: flex; flex-direction: column; align-items: center;
-    }
-
-    /* BRAND */
-    .lt-brand {
-      text-align: center; margin-bottom: 32px;
-      opacity: 0; transform: translateY(-14px);
-      animation: ltUp .5s .1s ease forwards;
-    }
-    .lt-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 14px 5px 9px; border-radius: 999px;
-      background: linear-gradient(135deg, #1a6aff, #00c6f7);
-      box-shadow: 0 4px 14px rgba(26,106,255,.28), inset 0 1px 0 rgba(255,255,255,.3);
-      margin-bottom: 14px;
-    }
-    .lt-pill-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.9);
-      animation: blink 1.8s ease-in-out infinite;
-    }
-    .lt-pill span {
-      font-family: 'Orbitron', sans-serif;
-      font-size: .6rem; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase; color: #fff;
-    }
-    .lt-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.6rem; font-weight: 900;
-      letter-spacing: -1px; line-height: 1; color: #071428;
-    }
-    .lt-name-bar {
-      display: block; width: 60px; height: 3px;
-      margin: 10px auto 0; border-radius: 999px;
-      background: linear-gradient(90deg, #1a6aff, #00c6f7);
-      box-shadow: 0 0 10px rgba(0,198,247,.5);
-    }
-    .lt-tagline {
-      margin-top: 13px; font-size: .85rem;
-      line-height: 1.7; font-weight: 500; color: #526890;
-    }
-    .lt-tagline strong { color: #1a6aff; font-weight: 700; }
-
-    /* SECTION */
-    .lt-section {
-      width: 100%; display: flex; align-items: center; gap: 8px;
-      margin-bottom: 12px; opacity: 0;
-    }
-    .lt-section span {
-      font-family: 'Orbitron', sans-serif;
-      font-size: .56rem; font-weight: 700;
-      letter-spacing: 2.5px; text-transform: uppercase;
-      color: #1a6aff; white-space: nowrap;
-    }
-    .lt-section::before, .lt-section::after {
-      content: ''; flex: 1; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(26,106,255,.22), transparent);
-    }
-    .lt-section.s1 { animation: ltUp .4s .27s ease forwards; }
-
-    /* GROUP */
-    .lt-group {
-      width: 100%; display: flex; flex-direction: column; gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    /* BUTTON */
-    .lt-btn {
-      display: flex; align-items: center; gap: 14px;
-      width: 100%; padding: 15px 18px;
-      border-radius: 18px; text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 700; font-size: .92rem;
-      position: relative; overflow: hidden;
-      transition: transform .18s ease, box-shadow .18s ease;
-      opacity: 0; animation: ltUp .4s ease forwards;
-      -webkit-tap-highlight-color: transparent; cursor: pointer;
-    }
-    .g1 .lt-btn:nth-child(1) { animation-delay: .34s; }
-    .g1 .lt-btn:nth-child(2) { animation-delay: .44s; }
-    .g1 .lt-btn:nth-child(3) { animation-delay: .54s; }
-
-    .lt-btn:hover  { transform: translateY(-2px); }
-    .lt-btn:active { transform: scale(.97); }
-
-    .lt-btn::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(140deg, rgba(255,255,255,.22) 0%, transparent 55%);
-      pointer-events: none; z-index: 1; border-radius: inherit;
-    }
-
-    /* PRIMARY */
-    .lt-primary {
-      background: linear-gradient(135deg, #1251c5 0%, #1a6aff 60%, #33aaff 100%);
-      border: 1px solid rgba(26,106,255,.5);
-      box-shadow: 0 6px 24px rgba(26,106,255,.28), inset 0 1px 0 rgba(255,255,255,.22);
-      color: #fff; padding: 19px 20px; font-size: .95rem;
-    }
-    .lt-primary .lt-sub  { color: rgba(255,255,255,.68); }
-    .lt-primary .lt-icon { background: rgba(255,255,255,.18); }
-    .lt-primary:hover    { box-shadow: 0 10px 32px rgba(26,106,255,.38); }
-    .lt-primary::after {
-      content: ''; position: absolute; top: 0; left: -110%;
-      width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-      transform: skewX(-18deg);
-      animation: shimmer 3.5s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    /* CYAN */
-    .lt-cyan {
-      background: linear-gradient(135deg, #0088bb 0%, #00c6f7 65%, #55ddff 100%);
-      border: 1px solid rgba(0,198,247,.45);
-      box-shadow: 0 6px 24px rgba(0,198,247,.22), inset 0 1px 0 rgba(255,255,255,.22);
-      color: #fff; padding: 19px 20px; font-size: .95rem;
-    }
-    .lt-cyan .lt-sub  { color: rgba(255,255,255,.68); }
-    .lt-cyan .lt-icon { background: rgba(255,255,255,.18); }
-    .lt-cyan:hover    { box-shadow: 0 10px 32px rgba(0,198,247,.35); }
-    .lt-cyan::after {
-      content: ''; position: absolute; top: 0; left: -110%;
-      width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-      transform: skewX(-18deg);
-      animation: shimmer 3.5s 1.75s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    /* GLASS */
-    .lt-glass {
-      background: rgba(255,255,255,.88);
-      border: 1.5px solid rgba(26,106,255,.18);
-      box-shadow: 0 4px 20px rgba(26,106,255,.09), inset 0 1px 0 rgba(255,255,255,.98);
-      color: #071428;
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    }
-    .lt-glass .lt-sub   { color: #526890; }
-    .lt-glass .lt-icon  { background: rgba(26,106,255,.09); }
-    .lt-glass .lt-arrow { color: #1a6aff; }
-    .lt-glass:hover {
-      background: rgba(255,255,255,.97);
-      box-shadow: 0 8px 28px rgba(26,106,255,.14);
-    }
-
-    /* PULSE */
-    .lt-pulse {
-      position: absolute; inset: -1px; border-radius: 18px;
-      border: 2px solid rgba(26,106,255,.35);
-      animation: pulseRing 2.6s ease-out infinite;
-      pointer-events: none; z-index: 0;
-    }
-    .lt-cyan .lt-pulse { border-color: rgba(0,198,247,.4); }
-
-    /* ICON */
-    .lt-icon {
-      width: 42px; height: 42px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; position: relative; z-index: 2;
-    }
-    .lt-icon svg { width: 20px; height: 20px; }
-
-    /* TEXT */
-    .lt-text { flex: 1; position: relative; z-index: 2; }
-    .lt-label { display: block; line-height: 1.2; }
-    .lt-sub { display: block; font-size: .7rem; font-weight: 500; margin-top: 3px; }
-    .lt-arrow { flex-shrink: 0; position: relative; z-index: 2; }
-
-    /* DIVIDER */
-    .lt-divider {
-      width: 100%; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(26,106,255,.15), transparent);
-      margin: 4px 0 18px; opacity: 0;
-      animation: ltUp .4s .65s ease forwards;
-    }
-
-    /* SOCIAL */
-    .lt-social {
-      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-      width: 100%; opacity: 0;
-      animation: ltUp .45s .75s ease forwards;
-    }
-    .lt-social-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 11px 20px; border-radius: 999px;
-      border: 1.5px solid rgba(26,106,255,.18);
-      background: rgba(255,255,255,.9);
-      backdrop-filter: blur(12px);
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: .75rem; font-weight: 700; color: #1a3060;
-      box-shadow: 0 3px 14px rgba(26,106,255,.1);
-      transition: all .2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .lt-social-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,106,255,.18); }
-    .lt-social-btn:active { transform: scale(.96); }
-
-    /* FOOTER */
-    .lt-footer {
-      margin-top: 30px; text-align: center;
-      opacity: 0; animation: ltUp .5s .85s ease forwards;
-    }
-    .lt-footer-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: .75rem; font-weight: 700;
-      letter-spacing: 1px; color: #1a6aff;
-    }
-    .lt-footer-copy { font-size: .64rem; color: rgba(80,110,160,.4); margin-top: 4px; }
-
-    /* KEYFRAMES */
-    @keyframes ltUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes shimmer {
-      0%, 100% { left: -110%; }
-      50%       { left: 160%; }
-    }
-    @keyframes pulseRing {
-      0%   { opacity: .5;  transform: scale(1); }
-      70%  { opacity: 0;   transform: scale(1.04); }
-      100% { opacity: 0;   transform: scale(1.04); }
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: .35; transform: scale(.6); }
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 400px) {
-      .lt-name { font-size: 2.1rem; }
-      .page { padding: 36px 14px 50px; }
-      .lt-social { flex-direction: column; align-items: center; }
-      .lt-social-btn { width: 100%; justify-content: center; }
-    }
-    @media (min-width: 600px) {
-      .page { padding: 64px 24px 80px; }
-      .lt-name { font-size: 3rem; }
+    
+    /* iOS Safari date fix */
+    @supports (-webkit-touch-callout: none) {
+      input[type="date"] {
+        padding: 12px !important;
+        font-size: 16px !important;
+      }
     }
   </style>
 </head>
-<body>
-
-<!-- ============================================================
-  ✏️  KONFIGURASI LINK — Isi URL di sini, lalu simpan file
-============================================================ -->
-<script>
-  const LINKS = {
-
-    /* ─── PLATFORM UTAMA ─────────────────────────────────────── */
-    PORTAL_BELAJAR   : "https://jagoasn.com/",
-    YOUTUBE_CHANNEL  : "https://www.youtube.com/@JagoASN",
-    GRUP_BELAJAR     : "https://t.me/+D5fZVWsEzLxlYTM1",
-
-    /* ─── SOSIAL MEDIA ───────────────────────────────────────── */
-    WHATSAPP_ADMIN   : "https://wa.me/+6282386496369",
-    INSTAGRAM        : "https://www.instagram.com/jago.asn?igsh=dmM0amQ1NTVuc3M3&utm_source=qr",
-
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("btn-portal").href    = LINKS.PORTAL_BELAJAR;
-    document.getElementById("btn-youtube").href   = LINKS.YOUTUBE_CHANNEL;
-    document.getElementById("btn-grup").href      = LINKS.GRUP_BELAJAR;
-    document.getElementById("btn-whatsapp").href  = LINKS.WHATSAPP_ADMIN;
-    document.getElementById("btn-instagram").href = LINKS.INSTAGRAM;
-  });
-</script>
-
-<div class="scan"></div>
-<div class="blob blob1"></div>
-<div class="blob blob2"></div>
-<div class="blob blob3"></div>
-
-<div class="page">
-  <div class="container">
-
-    <!-- BRAND -->
-    <div class="lt-brand">
-      <div class="lt-pill">
-        <div class="lt-pill-dot"></div>
-        <span>Platform CPNS</span>
+<body class="bg-gradient-to-br from-sky-50 to-emerald-50 min-h-screen flex items-center justify-center p-4">
+  
+  <div id="app" class="w-full max-w-md">
+    
+    <!-- Header Simetris -->
+    <div class="text-center mb-8 fade-up">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-sky-100 border-4 border-sky-200 flex items-center justify-center">
+        <i data-lucide="graduation-cap" class="w-8 h-8 text-sky-600"></i>
       </div>
-      <div class="lt-name">JagoASN</div>
-      <div class="lt-name-bar"></div>
-      <div class="lt-tagline">
-        Jagonya belajar CPNS: <strong>TWK, TIU, TKP</strong>,<br>tryout, dan kelas intensif.
-      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-sky-900 mb-2">SMA NEGERI 1 BUNUT</h1>
+      <p class="text-lg font-semibold text-sky-700 mb-1">Pengumuman Kelulusan Pukul 22.00 WIB </p>
+      <p class="text-sm text-sky-500">Tahun Ajaran 2025/2026</p>
     </div>
 
-    <!-- SECTION 1 -->
-    <div class="lt-section s1"><span>Platform Utama</span></div>
-
-    <div class="lt-group g1">
-
-      <a id="btn-portal" href="#" class="lt-btn lt-primary" target="_blank" rel="noopener">
-        <div class="lt-pulse"></div>
-        <div class="lt-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
+    <!-- Form Card Ramping -->
+    <div id="form-card" class="glass rounded-2xl shadow-xl border border-sky-100 p-8 fade-up" style="animation-delay:0.2s;">
+      <h2 class="text-xl font-bold text-sky-900 mb-1 text-center">Cek Kelulusan</h2>
+      <p class="text-sm text-sky-600 mb-8 text-center">Masukkan NISN dan tanggal lahir</p>
+      
+      <form id="check-form" class="space-y-5">
+        <div>
+          <label for="nisn" class="block text-sm font-semibold text-sky-800 mb-2">NISN</label>
+          <input id="nisn" type="text" inputmode="numeric" maxlength="10" placeholder="10 digit NISN" required 
+                 class="w-full rounded-xl border-2 border-sky-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-200/50 text-sm bg-white">
         </div>
-        <div class="lt-text">
-          <span class="lt-label">Portal Belajar JagoASN</span>
-          <span class="lt-sub">Akses materi, latihan soal & fitur lengkap</span>
+        
+        <div>
+          <label for="tgl-lahir" class="block text-sm font-semibold text-sky-800 mb-2">Tanggal Lahir</label>
+          <input id="tgl-lahir" type="date" required 
+                 class="w-full rounded-xl border-2 border-sky-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-200/50 text-sm bg-white">
         </div>
-        <svg class="lt-arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-
-      <a id="btn-youtube" href="#" class="lt-btn lt-cyan" target="_blank" rel="noopener">
-        <div class="lt-pulse"></div>
-        <div class="lt-icon">
-          <svg viewBox="0 0 24 24" fill="white">
-            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8z" opacity=".85"/>
-            <polygon points="9.75,15.5 15.5,12 9.75,8.5"/>
-          </svg>
-        </div>
-        <div class="lt-text">
-          <span class="lt-label">Kelas Gratis di YouTube</span>
-          <span class="lt-sub">Pembahasan soal & video belajar terlengkap</span>
-        </div>
-        <svg class="lt-arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-
-      <a id="btn-grup" href="#" class="lt-btn lt-glass" target="_blank" rel="noopener">
-        <div class="lt-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        </div>
-        <div class="lt-text">
-          <span class="lt-label">Gabung Grup Belajar</span>
-          <span class="lt-sub">Komunitas pejuang CPNS yang aktif</span>
-        </div>
-        <svg class="lt-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a6aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-
+        
+        <button type="submit" id="submit-btn" 
+                class="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-200 transition-all h-12">
+          <i data-lucide="search" class="w-5 h-5"></i>
+          <span>Cek Kelulusan</span>
+        </button>
+      </form>
+      
+      <p id="error-msg" class="hidden mt-5 p-3 rounded-xl text-sm text-red-500 text-center font-medium bg-red-50 border border-red-200"></p>
     </div>
 
-    <!-- DIVIDER -->
-    <div class="lt-divider"></div>
-
-    <!-- SOCIAL -->
-    <div class="lt-social">
-
-      <a id="btn-whatsapp" href="#" class="lt-social-btn" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="#25d366" width="16" height="16">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M11.98 0C5.37 0 0 5.373 0 11.988c0 2.109.553 4.09 1.524 5.808L.057 24l6.304-1.654a11.95 11.95 0 0 0 5.62 1.406h.005C18.59 23.752 24 18.379 24 11.764 24 5.176 18.59 0 11.98 0zm.004 21.747a9.924 9.924 0 0 1-5.058-1.384l-.362-.215-3.754.984 1.002-3.655-.237-.376A9.917 9.917 0 0 1 2.05 11.988C2.05 6.482 6.48 2.05 11.984 2.05c5.497 0 9.965 4.432 9.965 9.93 0 5.49-4.468 9.767-9.965 9.767z"/>
-        </svg>
-        WhatsApp Admin
-      </a>
-
-      <a id="btn-instagram" href="#" class="lt-social-btn" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-          <defs>
-            <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#f09433"/>
-              <stop offset="50%" stop-color="#dc2743"/>
-              <stop offset="100%" stop-color="#bc1888"/>
-            </linearGradient>
-          </defs>
-          <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#ig)"/>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="url(#ig)"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="url(#ig)"/>
-        </svg>
-        Instagram
-      </a>
-
+    <!-- Result Card Ramping -->
+    <div id="result-card" class="hidden glass rounded-2xl shadow-xl border border-sky-100 p-8 text-center relative overflow-hidden mt-6 fade-up">
+      <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
+      <div id="result-icon" class="mx-auto mb-4 w-12 h-12 rounded-xl bg-white/50 backdrop-blur flex items-center justify-center shadow-lg border border-white/30"></div>
+      
+      <h3 id="result-name" class="text-xl font-bold text-sky-900 mb-1"></h3>
+      <p id="result-nisn-display" class="text-sm text-sky-500 mb-4"></p>
+      
+      <div id="result-status" class="inline-block px-6 py-2 rounded-full text-sm font-bold mb-4 mx-auto"></div>
+      <p id="result-message" class="text-sm text-sky-700 mb-6 leading-relaxed"></p>
+      
+      <button id="back-btn" class="px-6 py-2 rounded-xl border-2 border-sky-200 text-sky-700 font-semibold hover:bg-sky-50 transition-all text-sm h-10 flex items-center justify-center mx-auto">
+        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+        Kembali
+      </button>
     </div>
-
-    <!-- FOOTER -->
-    <div class="lt-footer">
-      <div class="lt-footer-logo">◈ JagoASN</div>
-      <div class="lt-footer-copy">Platform Belajar CPNS Terpercaya · #JagoASN</div>
-    </div>
-
   </div>
-</div>
 
+  <script>
+    const students = [
+     { nisn: "0081377376", nama: "Ade Wiragunawan", tgl_lahir: "2008-02-06", status: "lulus" },
+  { nisn: "0081055219", nama: "Afifah Adawiyah Shadad", tgl_lahir: "2008-02-17", status: "lulus" },
+  { nisn: "0075419666", nama: "AFRIANDI", tgl_lahir: "2007-10-27", status: "verifikasi" },
+  { nisn: "0065867982", nama: "Ahmad Zaki", tgl_lahir: "2006-12-26", status: "verifikasi" },
+  { nisn: "0077142638", nama: "Aina Al Mardiah", tgl_lahir: "2007-12-06", status: "lulus" },
+  { nisn: "0088876465", nama: "Aisyah.R.HA", tgl_lahir: "2008-05-08", status: "lulus" },
+  { nisn: "0086983786", nama: "ALHAFIS", tgl_lahir: "2008-08-25", status: "lulus" },
+  { nisn: "0074574758", nama: "Ali Darma Hulu", tgl_lahir: "2007-12-20", status: "lulus" },
+  { nisn: "0081613871", nama: "Alif Ardiansyah", tgl_lahir: "2008-12-01", status: "lulus" },
+  { nisn: "0084246033", nama: "Alimul Ihsan", tgl_lahir: "2008-03-29", status: "lulus" },
+  { nisn: "0088389677", nama: "AMELDA MUSVIRA", tgl_lahir: "2008-08-20", status: "lulus" },
+  { nisn: "0073032882", nama: "AMELIA SAPUTRI", tgl_lahir: "2009-03-10", status: "lulus" },
+  { nisn: "0081944518", nama: "ANGGA SADTRIAWAN", tgl_lahir: "2008-11-10", status: "lulus" },
+  { nisn: "0074640087", nama: "Anisa Safitri", tgl_lahir: "2007-11-04", status: "lulus" },
+  { nisn: "0064248678", nama: "AUTOBER", tgl_lahir: "2006-10-21", status: "lulus" },
+  { nisn: "0096329145", nama: "Awit Putra Hutama", tgl_lahir: "2009-03-31", status: "lulus" },
+  { nisn: "0084976400", nama: "BASTIAN HANAN", tgl_lahir: "2008-04-10", status: "lulus" },
+  { nisn: "0077757250", nama: "BAYU ANGGARA", tgl_lahir: "2007-11-16", status: "lulus" },
+  { nisn: "0083832881", nama: "BELLA SAFITRI", tgl_lahir: "2008-08-06", status: "lulus" },
+  { nisn: "0051904048", nama: "CITRA SUSANTI", tgl_lahir: "2005-11-30", status: "lulus" },
+  { nisn: "0077344880", nama: "CYREN YUMA PUTRI", tgl_lahir: "2008-12-24", status: "lulus" },
+  { nisn: "0087515087", nama: "DAYU ANGGRAINI", tgl_lahir: "2009-01-21", status: "lulus" },
+  { nisn: "0086489455", nama: "DEBY AKBAR", tgl_lahir: "2008-07-24", status: "lulus" },
+  { nisn: "0076035441", nama: "Deka Delatul Faza", tgl_lahir: "2008-08-15", status: "lulus" },
+  { nisn: "0082805772", nama: "Della miftara", tgl_lahir: "2008-03-21", status: "lulus" },
+  { nisn: "0085651042", nama: "Dian Putri Cahyani", tgl_lahir: "2008-06-16", status: "lulus" },
+  { nisn: "0077041455", nama: "Dika Andrea Putra Setiawan", tgl_lahir: "2007-12-30", status: "lulus" },
+  { nisn: "0083154424", nama: "DIKE OKTAVIANI ZALUKHU", tgl_lahir: "2008-10-15", status: "lulus" },
+  { nisn: "0081186090", nama: "DZAKI ZULHANNAN", tgl_lahir: "2008-06-17", status: "lulus" },
+  { nisn: "0059335410", nama: "EKI PERWANDI", tgl_lahir: "2005-10-12", status: "lulus" },
+  { nisn: "0085502498", nama: "Enjelina Harefa", tgl_lahir: "2007-03-25", status: "lulus" },
+  { nisn: "0073240359", nama: "Erlin Estianti", tgl_lahir: "2007-12-29", status: "lulus" },
+  { nisn: "0085615594", nama: "FACHRY RAMADHAN", tgl_lahir: "2008-09-04", status: "lulus" },
+  { nisn: "0086565572", nama: "FADILA WATI", tgl_lahir: "2008-06-29", status: "lulus" },
+  { nisn: "0088491923", nama: "FAHIRA SAKA", tgl_lahir: "2009-07-31", status: "lulus" },
+  { nisn: "0088254110", nama: "Fani Sutra Sukma", tgl_lahir: "2008-06-26", status: "lulus" },
+  { nisn: "0077491760", nama: "Fauzi", tgl_lahir: "2008-06-08", status: "lulus" },
+  { nisn: "0082987870", nama: "FEBI RANATA", tgl_lahir: "2008-02-29", status: "lulus" },
+  { nisn: "0077480152", nama: "Febri Kurnia Wati", tgl_lahir: "2009-02-24", status: "lulus" },
+  { nisn: "0083561837", nama: "Febryanti", tgl_lahir: "2008-07-07", status: "lulus" },
+  { nisn: "0082277985", nama: "Fiky Sukrendi", tgl_lahir: "2008-01-27", status: "Tidak lulus" },
+  { nisn: "0076355028", nama: "FILEMON WARUWU", tgl_lahir: "2007-09-20", status: "lulus" },
+  { nisn: "0076978745", nama: "Firman Jaya Laia", tgl_lahir: "2007-12-10", status: "lulus" },
+  { nisn: "0082521547", nama: "FITRI ZEIN", tgl_lahir: "2008-10-11", status: "lulus" },
+  { nisn: "0078981613", nama: "GIO FANI", tgl_lahir: "2007-11-18", status: "lulus" },
+  { nisn: "0084062787", nama: "GUSTIANO PRATAMA", tgl_lahir: "2008-07-01", status: "lulus" },
+  { nisn: "0085977917", nama: "HAFIZZUDDIN KHOIRI", tgl_lahir: "2008-08-16", status: "lulus" },
+  { nisn: "0073059758", nama: "HAIKAL SUTIAWAN", tgl_lahir: "2007-09-27", status: "lulus" },
+  { nisn: "0074608404", nama: "HENGKI ZOL MAWAN", tgl_lahir: "2007-10-06", status: "lulus" },
+  { nisn: "0085680861", nama: "Herra Daratu Zara", tgl_lahir: "2008-12-07", status: "lulus" },
+  { nisn: "0082561434", nama: "IKA MULYANA", tgl_lahir: "2008-02-02", status: "lulus" },
+  { nisn: "0072380170", nama: "IKA MUTIA", tgl_lahir: "2008-06-26", status: "lulus" },
+  { nisn: "0085173852", nama: "IMELGA HESTY", tgl_lahir: "2008-07-17", status: "lulus" },
+  { nisn: "0081531880", nama: "INTAN DESTI PUTRI", tgl_lahir: "2008-09-16", status: "lulus" },
+  { nisn: "0086128046", nama: "JELIN ALMIA", tgl_lahir: "2008-11-13", status: "lulus" },
+  { nisn: "0073713073", nama: "JULITA SAFITRI", tgl_lahir: "2007-07-27", status: "lulus" },
+  { nisn: "0084556584", nama: "Kalvin Nduru", tgl_lahir: "2008-06-12", status: "lulus" },
+  { nisn: "3086004745", nama: "KHESYA ALYA PUTRI", tgl_lahir: "2008-07-23", status: "lulus" },
+  { nisn: "0084602864", nama: "Khoiril Asri", tgl_lahir: "2008-03-20", status: "lulus" },
+  { nisn: "0085769858", nama: "KIRISTIANI LASE", tgl_lahir: "2008-10-30", status: "lulus" },
+  { nisn: "0071616030", nama: "KURNIAWAN HABIBI", tgl_lahir: "2007-06-30", status: "lulus" },
+  { nisn: "0087969531", nama: "LAILATUSSYIFA", tgl_lahir: "2008-07-13", status: "lulus" },
+  { nisn: "0082535935", nama: "LIDYA ANZA TAMARA", tgl_lahir: "2008-09-25", status: "lulus" },
+  { nisn: "0089798843", nama: "LIN FITRI", tgl_lahir: "2008-08-07", status: "lulus" },
+  { nisn: "0078765378", nama: "LUDHFI HAZBILLAH", tgl_lahir: "2007-10-05", status: "lulus" },
+  { nisn: "0078086081", nama: "M. Bintang Kurniawan", tgl_lahir: "2007-11-10", status: "lulus" },
+  { nisn: "0085216534", nama: "M. SIDDIQ KHUSAINI", tgl_lahir: "2008-11-16", status: "lulus" },
+  { nisn: "0073377324", nama: "M.Aryaguna Dwi Putra", tgl_lahir: "2007-09-05", status: "lulus" },
+  { nisn: "0071991757", nama: "M. ZUL AZMI", tgl_lahir: "2009-12-21", status: "lulus" },
+  { nisn: "0077836893", nama: "MAGHFIRATUL HIDAYAH", tgl_lahir: "2007-11-29", status: "lulus" },
+  { nisn: "0083344066", nama: "Mai Zahrah", tgl_lahir: "2008-05-25", status: "lulus" },
+  { nisn: "0083538884", nama: "MALISA", tgl_lahir: "2008-08-01", status: "lulus" },
+  { nisn: "0086220356", nama: "MARSYA SAUQI", tgl_lahir: "2008-05-26", status: "lulus" },
+  { nisn: "0087616973", nama: "MARSYA SESSICA", tgl_lahir: "2008-08-07", status: "verifikasi" },
+  { nisn: "0079738138", nama: "MASDINUR", tgl_lahir: "2007-10-14", status: "verifikasi" },
+  { nisn: "0074100122", nama: "Mawar Nabila KS", tgl_lahir: "2007-04-17", status: "lulus" },
+  { nisn: "0081395982", nama: "Maysaroh Khairunnisah", tgl_lahir: "2008-06-07", status: "lulus" },
+  { nisn: "0089738705", nama: "MERSELYA PUTRI", tgl_lahir: "2008-03-24", status: "lulus" },
+  { nisn: "0083929271", nama: "MUHAMAD FAUZAN", tgl_lahir: "2008-02-06", status: "lulus" },
+  { nisn: "0085535603", nama: "MUHAMMAD ARDIANSYAH.S", tgl_lahir: "2008-12-27", status: "lulus" },
+  { nisn: "0083996987", nama: "MUHAMMAD FATHIR AL HADID", tgl_lahir: "2008-10-30", status: "lulus" },
+  { nisn: "0078782221", nama: "MUHAMMAD MARPEL", tgl_lahir: "2008-11-17", status: "lulus" },
+  { nisn: "0075474512", nama: "MUHAMMAD REDHO RIZKI FIRMANSYAH", tgl_lahir: "2007-06-12", status: "lulus" },
+  { nisn: "0087668709", nama: "MUHAMMAD RIZKY MARTHSYUR", tgl_lahir: "2008-03-05", status: "lulus" },
+  { nisn: "0085768567", nama: "MURKHOLIS ALFAJAR", tgl_lahir: "2008-05-03", status: "lulus" },
+  { nisn: "0062126144", nama: "MURNI JAYA ZENDRATO", tgl_lahir: "2006-12-04", status: "lulus" },
+  { nisn: "0088556735", nama: "MUZI ABDURAHMAN", tgl_lahir: "2008-06-27", status: "lulus" },
+  { nisn: "0085872928", nama: "NICEYLA PUTRI", tgl_lahir: "2008-03-02", status: "lulus" },
+  { nisn: "0088527514", nama: "Nina Rahayu", tgl_lahir: "2008-07-25", status: "lulus" },
+  { nisn: "0074496678", nama: "Nirmawati Laia", tgl_lahir: "2007-04-06", status: "lulus" },
+  { nisn: "0064081037", nama: "NOVA NIAMAN LASE", tgl_lahir: "2006-11-01", status: "lulus" },
+  { nisn: "0089892534", nama: "NOVAL LEGAWA", tgl_lahir: "2008-11-03", status: "lulus" },
+  { nisn: "0071910775", nama: "Nur Atina Sanggidatur Rofingah", tgl_lahir: "2007-10-09", status: "lulus" },
+  { nisn: "0074391686", nama: "Nur Ayu Agustina", tgl_lahir: "2007-08-28", status: "lulus" },
+  { nisn: "0073899218", nama: "NUR HAMDANI", tgl_lahir: "2007-12-27", status: "lulus" },
+  { nisn: "0073529874", nama: "NURUL ATIFA", tgl_lahir: "2007-08-18", status: "lulus" },
+  { nisn: "0072161314", nama: "NURUL FADDILAH", tgl_lahir: "2007-12-07", status: "lulus" },
+  { nisn: "0079756345", nama: "Pardomuan Rambe", tgl_lahir: "2007-11-27", status: "lulus" },
+  { nisn: "0078524049", nama: "FONI ARMAN HAREFA", tgl_lahir: "2007-12-21", status: "lulus" },
+  { nisn: "0089790169", nama: "Putri jelita Hulu", tgl_lahir: "2008-01-02", status: "lulus" },
+  { nisn: "0083594916", nama: "Rafita", tgl_lahir: "2008-06-17", status: "lulus" },
+  { nisn: "0081688354", nama: "Rahma Nurlatifa", tgl_lahir: "2008-05-02", status: "lulus" },
+  { nisn: "0085653059", nama: "RAHMAH WAHYU ANDINI", tgl_lahir: "2008-08-22", status: "lulus" },
+  { nisn: "0085614082", nama: "RAHMATUL FAJRI", tgl_lahir: "2008-09-17", status: "lulus" },
+  { nisn: "0079146077", nama: "RAMA HIDAYAT", tgl_lahir: "2007-09-03", status: "verifikasi" },
+  { nisn: "0086408796", nama: "RANDA FAUZAN", tgl_lahir: "2008-01-08", status: "lulus" },
+  { nisn: "0085959421", nama: "RASTI ANGRAINI", tgl_lahir: "2008-05-24", status: "lulus" },
+  { nisn: "0081427177", nama: "RAUDATUL JANNAH", tgl_lahir: "2008-12-28", status: "lulus" },
+  { nisn: "0084987292", nama: "Rejois Putri Halawa", tgl_lahir: "2008-07-08", status: "lulus" },
+  { nisn: "0069209414", nama: "Reno Repaldo", tgl_lahir: "2006-12-27", status: "lulus" },
+  { nisn: "0081532449", nama: "RIA MARYANA", tgl_lahir: "2008-04-04", status: "lulus" },
+  { nisn: "0082807695", nama: "Rico Ardiansyah Siregar", tgl_lahir: "2008-07-24", status: "lulus" },
+  { nisn: "0084804206", nama: "RIDO", tgl_lahir: "2008-09-16", status: "lulus" },
+  { nisn: "0085553817", nama: "RIFI SATRYA ATMAZA", tgl_lahir: "2008-01-28", status: "lulus" },
+  { nisn: "0086531712", nama: "RIRIN DWI RIANTI HASIBUAN", tgl_lahir: "2007-07-07", status: "lulus" },
+  { nisn: "0083575909", nama: "RISKA LIDYA FEBRIANI", tgl_lahir: "2008-02-25", status: "lulus" },
+  { nisn: "0087914208", nama: "RISKI RAHMAN", tgl_lahir: "2008-06-21", status: "lulus" },
+  { nisn: "0082056229", nama: "SABDIA MARSELIA", tgl_lahir: "2009-03-05", status: "lulus" },
+  { nisn: "0082316189", nama: "SAFNITA ANGELLERY", tgl_lahir: "2008-01-02", status: "lulus" },
+  { nisn: "0086881686", nama: "Samuel Tri Oktavianus Nduru", tgl_lahir: "2008-10-14", status: "lulus" },
+  { nisn: "0079378346", nama: "SANDI", tgl_lahir: "2007-10-02", status: "lulus" },
+  { nisn: "0075647661", nama: "SAUT", tgl_lahir: "2007-06-01", status: "lulus" },
+  { nisn: "0084283604", nama: "SELFIA", tgl_lahir: "2008-08-18", status: "lulus" },
+  { nisn: "0082958489", nama: "SELLY FEBRIYANI", tgl_lahir: "2008-02-13", status: "lulus" },
+  { nisn: "0089829583", nama: "SELVI AZIE RAHMADANI", tgl_lahir: "2008-09-12", status: "lulus" },
+  { nisn: "0083174899", nama: "Selvi Elviani", tgl_lahir: "2008-05-25", status: "lulus" },
+  { nisn: "0086118582", nama: "SELVI NUR HAISA", tgl_lahir: "2008-11-14", status: "lulus" },
+  { nisn: "0075350513", nama: "Septi Aulida", tgl_lahir: "2007-09-12", status: "lulus" },
+  { nisn: "0067705570", nama: "Septiani Lase", tgl_lahir: "2006-09-16", status: "lulus" },
+  { nisn: "0084409080", nama: "Silvia Agustina Giawa", tgl_lahir: "2008-08-10", status: "lulus" },
+  { nisn: "0079832145", nama: "Siti fatimah", tgl_lahir: "2007-04-01", status: "lulus" },
+  { nisn: "0076030896", nama: "Sri Ramadani", tgl_lahir: "2007-09-13", status: "lulus" },
+  { nisn: "0079957474", nama: "Syela Marsya", tgl_lahir: "2008-04-16", status: "lulus" },
+  { nisn: "0086181846", nama: "SYIFA HUSNUL UMARO", tgl_lahir: "2008-04-08", status: "lulus" },
+  { nisn: "0075706940", nama: "T. WAHYU NISA", tgl_lahir: "2007-12-19", status: "lulus" },
+  { nisn: "0085739234", nama: "TASSAH ALPANI RASINRIA", tgl_lahir: "2008-05-02", status: "lulus" },
+  { nisn: "0077357257", nama: "TERA MARDIANA", tgl_lahir: "2007-01-10", status: "lulus" },
+  { nisn: "0082079699", nama: "TEUKU FADILLAH AKBAR", tgl_lahir: "2008-07-05", status: "lulus" },
+  { nisn: "0083448827", nama: "viona aprilia putri", tgl_lahir: "2008-04-26", status: "lulus" },
+  { nisn: "0072395553", nama: "Wahyu Maulana", tgl_lahir: "2007-12-23", status: "lulus" },
+  { nisn: "0087287440", nama: "Wines Indah Fibri Halawa", tgl_lahir: "2008-02-02", status: "lulus" },
+  { nisn: "0078930898", nama: "YUDISTIRA RAMADHAN", tgl_lahir: "2007-10-04", status: "lulus" },
+  { nisn: "0081948767", nama: "YUGA ADINATA", tgl_lahir: "2008-01-13", status: "lulus" },
+  { nisn: "0078598660", nama: "Yunita Prastiwi", tgl_lahir: "2006-06-06", status: "lulus" },
+  { nisn: "0088699055", nama: "ZAKI RAMADHAN", tgl_lahir: "2008-09-28", status: "verifikasi" },
+  { nisn: "0083162277", nama: "ZAKI SA'BANI", tgl_lahir: "2008-07-31", status: "lulus" },
+  { nisn: "0074926812", nama: "ZAMHIR", tgl_lahir: "2007-12-05", status: "lulus" },
+  { nisn: "0081304854", nama: "ZASKIA OKTAFIA", tgl_lahir: "2008-10-03", status: "lulus" },
+  { nisn: "0086789618", nama: "ZERLINA PRIDASARI", tgl_lahir: "2008-08-06", status: "lulus" },
+  { nisn: "0086210525", nama: "ZIKRINA ISTIGHFARAH", tgl_lahir: "2008-07-03", status: "lulus" },
+  { nisn: "0061298842", nama: "ZUNILA", tgl_lahir: "2006-11-27", status: "lulus" },
+  { nisn: "0078294988", nama: "ZURIYAN", tgl_lahir: "2008-01-09", status: "lulus" },
+  { nisn: "0086724309", nama: "ANUGRAH SEGARIA", tgl_lahir: "2008-05-09", status: "lulus" },
+  { nisn: "0076135396", nama: "BUNGA", tgl_lahir: "2007-08-31", status: "lulus" },
+  { nisn: "0086697703", nama: "MECA RAHMADANI", tgl_lahir: "2008-09-11", status: "lulus" },
+  { nisn: "0092238900", nama: "ZIVANA LATISHA", tgl_lahir: "2009-01-26", status: "lulus" },
+  { nisn: "0078294183", nama: "KHAIRIL UMMAH", tgl_lahir: "2007-03-16", status: "lulus" },
+    ];
+
+    const form = document.getElementById('check-form');
+    const formCard = document.getElementById('form-card');
+    const resultCard = document.getElementById('result-card');
+    const errorMsg = document.getElementById('error-msg');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      errorMsg.classList.add('hidden');
+
+      const nisn = document.getElementById('nisn').value.trim();
+      const tglLahir = document.getElementById('tgl-lahir').value;
+
+      if (nisn.length !== 10) {
+        errorMsg.textContent = "NISN masukkan dengan benar";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      const student = students.find(s => s.nisn === nisn && s.tgl_lahir === tglLahir);
+      if (!student) {
+        errorMsg.textContent = "Data tidak ditemukan";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      showResult(student);
+    });
+
+    function showResult(student) {
+      formCard.classList.add('fade-out');
+      setTimeout(() => {
+        formCard.classList.add('hidden');
+        formCard.classList.remove('fade-out');
+        resultCard.classList.remove('hidden');
+        resultCard.classList.add('scale-in');
+
+        document.getElementById('result-name').textContent = student.nama;
+        document.getElementById('result-nisn-display').textContent = `NISN: ${student.nisn}`;
+
+        const statusEl = document.getElementById('result-status');
+        const iconEl = document.getElementById('result-icon');
+        const msgEl = document.getElementById('result-message');
+
+        if (student.status === "lulus") {
+          iconEl.innerHTML = '<i data-lucide="award" class="w-6 h-6 text-green-500"></i>';
+          statusEl.textContent = "LULUS";
+          statusEl.className = "inline-block px-6 py-2 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-200";
+          msgEl.textContent = "Selamat! Anda dinyatakan LULUS.";
+          spawnConfetti();
+        } else if (student.status === "verifikasi") {
+          iconEl.innerHTML = '<i data-lucide="clock" class="w-6 h-6 text-blue-500"></i>';
+          statusEl.textContent = "VERIFIKASI";
+          statusEl.className = "inline-block px-6 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-700 border border-blue-200";
+          msgEl.innerHTML = `<div class="text-left bg-blue-50 rounded-lg p-3 mt-2 text-xs">
+            <p class="font-semibold mb-1">Status sedang diverifikasi:</p>
+            <ul class="space-y-1 pl-3 text-xs">
+              <li>• Belum Menuntaskan Tugas</li>
+              <li>• Hubungi Wali Kelas</li>
+            </ul>
+            <p class="mt-2">Cek kembali besok</p>
+          </div>`;
+        } else {
+          iconEl.innerHTML = '<i data-lucide="x-circle" class="w-6 h-6 text-red-500"></i>';
+          statusEl.textContent = "TIDAK LULUS";
+          statusEl.className = "inline-block px-6 py-2 rounded-full text-sm font-bold bg-red-100 text-red-700 border border-red-200";
+          msgEl.textContent = "Tidak Mengikuti KBM dan Tidak mengikuti ujian, .";
+        }
+        lucide.createIcons();
+      }, 300);
+    }
+
+    function spawnConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.innerHTML = '';
+      const colors = ['#10b981','#22c55e','#84cc16','#f59e0b','#ec4899','#8b5cf6','#06b6d4','#0284c7'];
+      for (let i = 0; i < 30; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = '80%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.3 + 's';
+        container.appendChild(piece);
+      }
+    }
+
+    document.getElementById('back-btn').addEventListener('click', function() {
+      resultCard.classList.add('fade-out');
+      setTimeout(() => {
+        resultCard.classList.add('hidden');
+        resultCard.classList.remove('fade-out', 'scale-in');
+        formCard.classList.remove('hidden');
+        formCard.classList.add('fade-up');
+        form.reset();
+      }, 300);
+    });
+
+    lucide.createIcons();
+  </script>
 </body>
 </html>
